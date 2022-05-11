@@ -1,5 +1,6 @@
 #########Projet final de STAT203#############################
-setwd("~/ENSTA 2A/STA203")
+#setwd("~/ENSTA 2A/STA203")
+setwd("~/Documents/STA203/STA203")
 
 library("openxlsx")
 rm(list=objects()) ; graphics.off()
@@ -9,24 +10,24 @@ data = read.xlsx("Raisin.xlsx",colNames=TRUE)
 
 #question 1
 
-#Analyse uni-variéé : boxplot
+#Analyse uni-variee : boxplot
 p = ncol(data)
 boxplot(data[,c(1,5)]) 
 boxplot(data[,-p])
 boxplot(data[,c(2,3)]) #axis length
-boxplot(data[,c(4,6)])#excentricité extent
-boxplot(data[,c(7)]) #périmètre
+boxplot(data[,c(4,6)])#excentricite extent
+boxplot(data[,c(7)]) #perimetre
 
-#Analyse bi-variée
+#Analyse bi-vari?e
 
-#matrice de corrélation
+#matrice de correlation
 round(cor(data[-p]),2)
 library(corrplot)
 corrplot(cor(data[,-p]), method="circle")
 
 pairs(data[,-p],col=ifelse(data$Class=="Kecimen", "black", "red"))
 
-# pour regarder de plus prêt les répartitions
+# pour regarder de plus pr?t les r?partitions
 ggplot(data,aes(x=data$Area,y=data$Perimeter,color=as.factor(data$Class))) + geom_point()
 
 
@@ -67,11 +68,8 @@ centres = data[sample(1:n,2),-p]
 centres = data[1:2,-p]
 res.kmeans = kmeans (data[-p],centres)
 
-
 #erreur de classification
 table(pred=res.kmeans$cluster,vrai=data$Class)
-
-
 
 #normalisation des variables
 
@@ -79,7 +77,6 @@ data.scale= scale(data[-p])
 centres.scale = data.scale[sample(1:n,2),-p]
 centres.scale = data.scale[1:2,-p]
 res.kmeans.scale = kmeans(data.scale,centres.scale)
-
 
 #erreur de classification
 table(pred=res.kmeans.scale$cluster,vrai=data$Class)
@@ -94,7 +91,7 @@ train = sample(c(TRUE,FALSE),n,rep=TRUE,prob=c(2/3,1/3))
 data_train = cbind(Class = data$Class,as.data.frame(res$ind$coord))[train,]
 data_test = cbind(Class = data$Class,as.data.frame(res$ind$coord))[-train,]
 
-#modèle complet
+#mod?le complet
 
 
 res.glm.complet = glm(Class~.,
@@ -107,7 +104,7 @@ predicted.classes
 mean(predicted.classes == data_test$Class) #0.865406
 
 
-#modèle deux composantes principales
+#mod?le deux composantes principales
 
 comp1 = res$ind$coord[train,1]
 comp2 = res$ind$coord[train,2]
@@ -135,7 +132,7 @@ data_train %>%
   )
 
 
-# modèle par AIC
+# mod?le par AIC
 glm = glm(Class~.,family=binomial,data=data_train)
 selection=MASS::stepAIC(glm,direction="both")
 glm.AIC = glm(Class~Dim.1+Dim.2 + Dim.3 + Dim.5,family=binomial,data=data_train)
@@ -146,7 +143,7 @@ predicted.classes
 mean(predicted.classes == data_test$Class) #0.862069
 
 
-# modèle obtenu par régression pénalisée lasso
+# mod?le obtenu par r?gression p?nalis?e lasso
 
 library(glmnet)
 
@@ -164,7 +161,7 @@ mean(predicted.classes == data_test$Class) #0.8464961
 
 #question 3 : SVM
 
-#SVM linéaire
+#SVM lin?aire
 
 library(e1071)
 co= cbind(0.001, 0.01, 0.1, 1, 5, 10, 100)
