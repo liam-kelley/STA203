@@ -84,15 +84,21 @@ table(pred=res.kmeans.scale$cluster,vrai=data$Class)
 #question3.2- Classification hierarchique
 
 table_distances=dist(data[,-p])
-
-mon_arbre=hclust(table_distances,method="ward.D")
+mon_arbre=hclust(table_distances)
+#mon_arbre=hclust(table_distances,method="ward.D")
 mon_arbre
-
 #Cluster method   : ward.D 
 #Distance         : euclidean 
 #Number of objects: 900 
 
-plot(mon_arbre)
+plot(mon_arbre, cex=0.5)
+
+#normalisation des variables
+
+table_distances2=dist(data.scale)
+mon_arbre2=hclust(table_distances2)
+mon_arbre2
+plot(mon_arbre2, cex=0.5)
 
 #Question 4 
 
