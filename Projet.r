@@ -100,6 +100,16 @@ mon_arbre2=hclust(table_distances2)
 mon_arbre2
 plot(mon_arbre2, cex=0.5)
 
+barplot(rev(mon_arbre2$height)[1:15],main="diagramme des hauteurs")
+abline(h=12)       # 2 classes
+
+cutree(mon_arbre2,h=12);
+plot(as.factor(cutree(mon_arbre2,h=12)))
+
+#erreur de classification
+table(pred=as.factor(cutree(mon_arbre2,h=12)),vrai=data$Class)
+
+
 #Question 4 
 
 ######################PARTIE 2 
