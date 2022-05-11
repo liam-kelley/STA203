@@ -59,7 +59,7 @@ res$var$cos2[,1:2]
 # Perimeter       0.98212422 0.001696952
 
 
-#Question 3 
+#Question 3.1 
 
 # K-means
 n = nrow(data)
@@ -78,10 +78,25 @@ centres.scale = data.scale[sample(1:n,2),-p]
 centres.scale = data.scale[1:2,-p]
 res.kmeans.scale = kmeans(data.scale,centres.scale)
 
-#erreur de classification
+#erreur de classification avec var normalisees
 table(pred=res.kmeans.scale$cluster,vrai=data$Class)
 
-##PARTIE 2
+#question3.2- Classification hierarchique
+
+table_distances=dist(data[,-p])
+
+mon_arbre=hclust(table_distances,method="ward.D")
+mon_arbre
+
+#Cluster method   : ward.D 
+#Distance         : euclidean 
+#Number of objects: 900 
+
+plot(mon_arbre)
+
+#Question 4 
+
+######################PARTIE 2 
 
 #question2
 
