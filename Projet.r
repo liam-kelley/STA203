@@ -6,9 +6,9 @@ library("openxlsx")
 rm(list=objects()) ; graphics.off()
 data = read.xlsx("Raisin.xlsx",colNames=TRUE)
 
-#PARTIE 1 
+#################################################################### PARTIE 1 
 
-#question 1
+#-------------------------------------------question 1
 
 #Analyse uni-variee : boxplot
 p = ncol(data)
@@ -31,7 +31,7 @@ pairs(data[,-p],col=ifelse(data$Class=="Kecimen", "black", "red"))
 ggplot(data,aes(x=data$Area,y=data$Perimeter,color=as.factor(data$Class))) + geom_point()
 
 
-#question 2 : ACP
+#---------------------------------question 2 : ACP
 
 library("FactoMineR")
 
@@ -59,7 +59,7 @@ res$var$cos2[,1:2]
 # Perimeter       0.98212422 0.001696952
 
 
-#Question 3.1 
+#----------------------------------Question 3.1 - k-means
 
 # K-means
 n = nrow(data)
@@ -81,38 +81,37 @@ res.kmeans.scale = kmeans(data.scale,centres.scale)
 #erreur de classification avec var normalisees
 table(pred=res.kmeans.scale$cluster,vrai=data$Class)
 
-#question3.2- Classification hierarchique
+#----------------------------------question3.2- Classification hierarchique
 
-table_distances=dist(data[,-p])
-mon_arbre=hclust(table_distances)
-#mon_arbre=hclust(table_distances,method="ward.D")
-mon_arbre
-#Cluster method   : ward.D 
+d.data = dist(data[,-p])
+cah.ward = hclust(d.data, method="ward.D2")
+cah.ward
+#Cluster method   : ward.D2
 #Distance         : euclidean 
 #Number of objects: 900 
+plot(cah.ward, cex=0.5)
 
-plot(mon_arbre, cex=0.5)
+#avec variables normalisées
+d.data2 = dist(data.scale)
+cah.ward2 = hclust(d.data2, method="ward.D2")
+cah.ward2
+plot(cah.ward2, cex=0.5)
 
-#normalisation des variables
-
-table_distances2=dist(data.scale)
-mon_arbre2=hclust(table_distances2)
-mon_arbre2
-plot(mon_arbre2, cex=0.5)
-
-barplot(rev(mon_arbre2$height)[1:15],main="diagramme des hauteurs")
-abline(h=12)       # 2 classes
-
-cutree(mon_arbre2,h=12);
-plot(as.factor(cutree(mon_arbre2,h=12)))
+# dendrogram with highlighting of the groups
+rect.hclust(cah.ward2,k=2)
+# partition in 4 groups
+groupes.cah <- cutree(cah.ward2,k=2)
+# assignment of the instances to clusters
+print(sort(groupes.cah))
+plot(as.factor(groupes.cah))
 
 #erreur de classification
-table(pred=as.factor(cutree(mon_arbre2,h=12)),vrai=data$Class)
+table(pred=as.factor(groupes.cah),vrai=data$Class)
 
 
-#Question 4 
+#-------------------------------------------------Question 4 
 
-######################PARTIE 2 
+########################################################### PARTIE 2 
 
 #question2
 
@@ -120,7 +119,7 @@ set.seed(1)
 n = nrow(data)
 train = sample(c(TRUE,FALSE),n,rep=TRUE,prob=c(2/3,1/3))
 data_train = cbind(Class = data$Class,as.data.frame(res$ind$coord))[train,]
-data_test = cbind(Class = data$Class,as.data.frame(res$ind$coord))[-train,]
+data_test = cbind(Class = data$Class,as.data.frame(res$ind$coord))[!train,]
 
 #mod?le complet
 
