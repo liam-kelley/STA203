@@ -36,18 +36,18 @@ ggplot(data,aes(x=data$Area,y=data$Perimeter,color=as.factor(data$Class))) + geo
 library("FactoMineR")
 
 data$Class = as.factor(data$Class)
-res=PCA(data,quali.sup = p, graph = TRUE)
-plt1 = plot(res,axes=c(1,2),choix="ind",label="quali", habillage=p) +
+res.PCA=PCA(data,quali.sup = p, graph = TRUE)
+plt1=plot(res.PCA,axes=c(1,2),choix="ind",label="quali", habillage=p) +
   theme(legend.position = "none") 
-plt2 = plot(res,axes=c(2,3),choix="ind",label="quali", habillage=p) 
-plt4 = plot(res,axes=c(6,5),choix="ind",label="quali", habillage=p) 
+plt2=plot(res.PCA,axes=c(2,3),choix="ind",label="quali", habillage=p) 
+plt4=plot(res.PCA,axes=c(6,5),choix="ind",label="quali", habillage=p) 
 plt4
-plt3 = plot(res,choix="var")
-cowplot::plot_grid(plt1, plt4, nrow=1, ncol=2)
+plt3 = plot(res.PCA,choix="var")
+cowplot::plot_grid(plt1, plt3, nrow=1, ncol=2)
 
 barplot(res$eig[,1])
 
-res$var$cos2[,1:2]
+res.PCA$var$cos2[,1:2]
 # > res$var$cos2[,1:2]
 #                  Dim.1       Dim.2
 # Area            0.97109063 0.019587803
@@ -108,8 +108,24 @@ plot(as.factor(groupes.cah))
 #erreur de classification
 table(pred=as.factor(groupes.cah),vrai=data$Class)
 
+#
+#res=PCA(data,quali.sup = p, graph = TRUE)
+#plt1=plot(res,axes=c(1,2),choix="ind",label="quali", habillage=p) +
+#  theme(legend.position = "none") 
+#plt2=plot(res,axes=c(2,3),choix="ind",label="quali", habillage=p) 
+#plt4=plot(res,axes=c(6,5),choix="ind",label="quali", habillage=p) 
+#plt4
+#plt3 = plot(res,choix="var")
+#cowplot::plot_grid(plt1, plt3, nrow=1, ncol=2)
 
-#-------------------------------------------------Question 4 
+#barplot(res$eig[,1])
+
+#res$var$cos2[,1:2]
+
+
+#-------------------------------------------------Question 4
+
+res.pca2 = PCA(data.scale,graph=TRUE)
 
 ########################################################### PARTIE 2 
 
