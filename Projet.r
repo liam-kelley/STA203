@@ -108,24 +108,52 @@ plot(as.factor(groupes.cah))
 #erreur de classification
 table(pred=as.factor(groupes.cah),vrai=data$Class)
 
-#
-#res=PCA(data,quali.sup = p, graph = TRUE)
-#plt1=plot(res,axes=c(1,2),choix="ind",label="quali", habillage=p) +
-#  theme(legend.position = "none") 
-#plt2=plot(res,axes=c(2,3),choix="ind",label="quali", habillage=p) 
-#plt4=plot(res,axes=c(6,5),choix="ind",label="quali", habillage=p) 
-#plt4
-#plt3 = plot(res,choix="var")
-#cowplot::plot_grid(plt1, plt3, nrow=1, ncol=2)
-
-#barplot(res$eig[,1])
-
-#res$var$cos2[,1:2]
-
 
 #-------------------------------------------------Question 4
 
-res.pca2 = PCA(data.scale,graph=TRUE)
+#for (i in 1:7) {
+#  res.pca2 = PCA(data.scale, ncp = i, graph=FALSE)
+#  res.hcpc <- HCPC(res.pca2, graph = FALSE)
+#}
+
+res.pca2 = PCA(data.scale, ncp = 1, graph=FALSE)
+res.hcpc <- HCPC(res.pca2, nb.clust=2, graph = TRUE)
+
+res.pca2 = PCA(data.scale, ncp = 2, graph=FALSE)
+res.hcpc <- HCPC(res.pca2, nb.clust=2, graph = TRUE)
+
+res.pca2 = PCA(data.scale, ncp = 3, graph=FALSE)
+res.hcpc <- HCPC(res.pca2, nb.clust=2, graph = TRUE)
+
+res.pca2 = PCA(data.scale, ncp = 4, graph=FALSE)
+res.hcpc <- HCPC(res.pca2, nb.clust=2, graph = TRUE)
+
+res.pca2 = PCA(data.scale, ncp = 5, graph=FALSE)
+res.hcpc <- HCPC(res.pca2, nb.clust=2, graph = TRUE)
+
+res.pca2 = PCA(data.scale, ncp = 6, graph=FALSE)
+res.hcpc <- HCPC(res.pca2, nb.clust=2, graph = TRUE)
+
+res.pca2 = PCA(data.scale, ncp = 7, graph=FALSE)
+res.hcpc <- HCPC(res.pca2, nb.clust=2, graph = TRUE)
+
+library("factoextra")
+
+fviz_dend(res.hcpc, 
+          cex = 0.7,                     # Taille du text
+          palette = "jco",               # Palette de couleur ?ggpubr::ggpar
+          rect = TRUE, rect_fill = TRUE, # Rectangle autour des groupes
+          rect_border = "jco",           # Couleur du rectangle
+          labels_track_height = 0.8      # Augment l'espace pour le texte
+)
+
+fviz_cluster(res.hcpc,
+             repel = TRUE,            # Evite le chevauchement des textes
+             show.clust.cent = TRUE, # Montre le centre des clusters
+             palette = "jco",         # Palette de couleurs, voir ?ggpubr::ggpar
+             ggtheme = theme_minimal(),
+             main = "Factor map"
+)
 
 ########################################################### PARTIE 2 
 
