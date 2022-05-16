@@ -116,26 +116,46 @@ table(pred=as.factor(groupes.cah),vrai=data$Class)
 #  res.hcpc <- HCPC(res.pca2, graph = FALSE)
 #}
 
+res.pca2 = MCA(data.scale, ncp = 1, graph = FALSE)
+res.hcpc = HCPC(res.pca2, nb.clust=2, graph = FALSE)
+groupes.hcpc = res.hcpc$data.clust$clust
+table(pred=groupes.hcpc,vrai=data$Class) #erreur de classification = 214
+
+
 res.pca2 = PCA(data.scale, ncp = 1, graph=FALSE)
-res.hcpc <- HCPC(res.pca2, nb.clust=2, graph = TRUE)
+res.hcpc = HCPC(res.pca2, nb.clust=2, graph = TRUE)
+groupes.hcpc = res.hcpc$data.clust$clust
+table(pred=groupes.hcpc,vrai=data$Class) #erreur de classification = 214
 
 res.pca2 = PCA(data.scale, ncp = 2, graph=FALSE)
-res.hcpc <- HCPC(res.pca2, nb.clust=2, graph = TRUE)
+res.hcpc = HCPC(res.pca2, nb.clust=2, graph = TRUE)
+groupes.hcpc = res.hcpc$data.clust$clust
+table(pred=groupes.hcpc,vrai=data$Class) #erreur de classification = 214
 
 res.pca2 = PCA(data.scale, ncp = 3, graph=FALSE)
-res.hcpc <- HCPC(res.pca2, nb.clust=2, graph = TRUE)
+res.hcpc = HCPC(res.pca2, nb.clust=2, graph = TRUE)
+groupes.hcpc = res.hcpc$data.clust$clust
+table(pred=groupes.hcpc,vrai=data$Class) #erreur de classification = 209
 
 res.pca2 = PCA(data.scale, ncp = 4, graph=FALSE)
-res.hcpc <- HCPC(res.pca2, nb.clust=2, graph = TRUE)
+res.hcpc = HCPC(res.pca2, nb.clust=2, graph = TRUE)
+groupes.hcpc = res.hcpc$data.clust$clust
+table(pred=groupes.hcpc,vrai=data$Class) #erreur de classification = 209
 
 res.pca2 = PCA(data.scale, ncp = 5, graph=FALSE)
-res.hcpc <- HCPC(res.pca2, nb.clust=2, graph = TRUE)
+res.hcpc = HCPC(res.pca2, nb.clust=2, graph = TRUE)
+groupes.hcpc = res.hcpc$data.clust$clust
+table(pred=groupes.hcpc,vrai=data$Class) #erreur de classification = 209
 
 res.pca2 = PCA(data.scale, ncp = 6, graph=FALSE)
-res.hcpc <- HCPC(res.pca2, nb.clust=2, graph = TRUE)
+res.hcpc = HCPC(res.pca2, nb.clust=2, graph = TRUE)
+groupes.hcpc = res.hcpc$data.clust$clust
+table(pred=groupes.hcpc,vrai=data$Class) #erreur de classification = 209
 
 res.pca2 = PCA(data.scale, ncp = 7, graph=FALSE)
-res.hcpc <- HCPC(res.pca2, nb.clust=2, graph = TRUE)
+res.hcpc = HCPC(res.pca2, nb.clust=2, graph = TRUE)
+groupes.hcpc = res.hcpc$data.clust$clust
+table(pred=groupes.hcpc,vrai=data$Class) #erreur de classification = 209
 
 library("factoextra")
 
