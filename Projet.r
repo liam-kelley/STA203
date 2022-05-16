@@ -435,7 +435,6 @@ pred_test = predict(res.svm,data_test)
 library(ade4)
 data_train2 = as.data.frame(data.scale)[train,] # need own data.train to apply pca to
 data_test2 = as.data.frame(data.scale)[!train,]
-#res.pca3=PCA(data_train2, ncp = 2, quali.sup = p, graph = TRUE)
 rm(res.pca3)
 res.pca3=dudi.pca(data_train2, scannf = FALSE, nf = 2)
 summary(res.pca3)
@@ -445,7 +444,10 @@ full=rbind(res.pca3$li,res.pca3plusproj$lisup)
 #plot(res.pca3plusproj$lisup)
 plot(full,col=as.factor(cbind(rep("train", 600),rep("projected tests",300))))
 
-#---------------- intro to reste
+#En utilisant que PCA
+res.pca4=PCA(as.data.frame(rbind(data_train2,data_test2)), ncp = 2, ind.sup = seq(601, 900, 1), graph = TRUE)
+
+#---------------- intro au reste
 
 # on ne travaille que sur les 2 premieres composantes principales 
 
