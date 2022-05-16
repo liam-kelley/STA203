@@ -432,16 +432,20 @@ pred_test = predict(res.svm,data_test)
 
 #-----------------------------------------------------------question 1
 
-#set.seed(1)
-#n = nrow(data)
-#train = sample(c(TRUE,FALSE),n,rep=TRUE,prob=c(2/3,1/3))
-data_train2 = cbind(as.data.frame(data.scale),Class = data$Class)[train,] # need own data.train to apply pca to
-data_test2 = cbind(as.data.frame(data.scale),Class = data$Class)[!train,]
-res.pca3=PCA(data_train2, ncp = 2, quali.sup = p, graph = TRUE)
+library(ade4)
+data_train2 = as.data.frame(data.scale)[train,] # need own data.train to apply pca to
+data_test2 = as.data.frame(data.scale)[!train,]
+#res.pca3=PCA(data_train2, ncp = 2, quali.sup = p, graph = TRUE)
+rm(res.pca3)
+res.pca3=dudi.pca(data_train2, scannf = FALSE, nf = 2)
 summary(res.pca3)
-resproj.pca3 <- suprow(res.pca3, data_test2)
+res.pca3plusproj=suprow(res.pca3, data_test2)
+full=rbind(res.pca3$li,res.pca3plusproj$lisup)
+#plot(res.pca3$li)
+#plot(res.pca3plusproj$lisup)
+plot(full,col=as.factor(cbind(rep("train", 600),rep("projected tests",300))))
 
-#----------------
+#---------------- intro to reste
 
 # on ne travaille que sur les 2 premieres composantes principales 
 
