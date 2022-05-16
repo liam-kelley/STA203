@@ -116,46 +116,44 @@ table(pred=as.factor(groupes.cah),vrai=data$Class)
 #  res.hcpc <- HCPC(res.pca2, graph = FALSE)
 #}
 
-res.pca2 = MCA(data.scale, ncp = 1, graph = FALSE)
-res.hcpc = HCPC(res.pca2, nb.clust=2, graph = FALSE)
-groupes.hcpc = res.hcpc$data.clust$clust
-table(pred=groupes.hcpc,vrai=data$Class) #erreur de classification = 214
-
-
 res.pca2 = PCA(data.scale, ncp = 1, graph=FALSE)
+summary(res.pca2)
 res.hcpc = HCPC(res.pca2, nb.clust=2, graph = TRUE)
-groupes.hcpc = res.hcpc$data.clust$clust
-table(pred=groupes.hcpc,vrai=data$Class) #erreur de classification = 214
+groupes.hcpc1 = res.hcpc$data.clust$clust
+table(pred=groupes.hcpc1,vrai=data$Class) #erreur de classification = 214
 
 res.pca2 = PCA(data.scale, ncp = 2, graph=FALSE)
 res.hcpc = HCPC(res.pca2, nb.clust=2, graph = TRUE)
-groupes.hcpc = res.hcpc$data.clust$clust
-table(pred=groupes.hcpc,vrai=data$Class) #erreur de classification = 214
+groupes.hcpc2 = res.hcpc$data.clust$clust
+table(pred=groupes.hcpc2,vrai=data$Class) #erreur de classification = 214
+
+table(un=groupes.hcpc1,deux=groupes.hcpc2)
 
 res.pca2 = PCA(data.scale, ncp = 3, graph=FALSE)
 res.hcpc = HCPC(res.pca2, nb.clust=2, graph = TRUE)
-groupes.hcpc = res.hcpc$data.clust$clust
-table(pred=groupes.hcpc,vrai=data$Class) #erreur de classification = 209
+groupes.hcpc3 = res.hcpc$data.clust$clust
+table(pred=groupes.hcpc3,vrai=data$Class) #erreur de classification = 209
 
 res.pca2 = PCA(data.scale, ncp = 4, graph=FALSE)
 res.hcpc = HCPC(res.pca2, nb.clust=2, graph = TRUE)
-groupes.hcpc = res.hcpc$data.clust$clust
-table(pred=groupes.hcpc,vrai=data$Class) #erreur de classification = 209
+groupes.hcpc4 = res.hcpc$data.clust$clust
+table(pred=groupes.hcpc4,vrai=data$Class) #erreur de classification = 209
 
 res.pca2 = PCA(data.scale, ncp = 5, graph=FALSE)
 res.hcpc = HCPC(res.pca2, nb.clust=2, graph = TRUE)
-groupes.hcpc = res.hcpc$data.clust$clust
-table(pred=groupes.hcpc,vrai=data$Class) #erreur de classification = 209
+groupes.hcpc5 = res.hcpc$data.clust$clust
+table(pred=groupes.hcpc5,vrai=data$Class) #erreur de classification = 209
 
 res.pca2 = PCA(data.scale, ncp = 6, graph=FALSE)
 res.hcpc = HCPC(res.pca2, nb.clust=2, graph = TRUE)
-groupes.hcpc = res.hcpc$data.clust$clust
-table(pred=groupes.hcpc,vrai=data$Class) #erreur de classification = 209
+groupes.hcpc6 = res.hcpc$data.clust$clust
+table(pred=groupes.hcpc6,vrai=data$Class) #erreur de classification = 209
 
 res.pca2 = PCA(data.scale, ncp = 7, graph=FALSE)
 res.hcpc = HCPC(res.pca2, nb.clust=2, graph = TRUE)
-groupes.hcpc = res.hcpc$data.clust$clust
-table(pred=groupes.hcpc,vrai=data$Class) #erreur de classification = 209
+groupes.hcpc7 = res.hcpc$data.clust$clust
+table(pred=groupes.hcpc7,vrai=data$Class) #erreur de classification = 209
+
 
 library("factoextra")
 
@@ -182,6 +180,7 @@ fviz_cluster(res.hcpc,
 set.seed(1)
 n = nrow(data)
 train = sample(c(TRUE,FALSE),n,rep=TRUE,prob=c(2/3,1/3))
+
 data_train = cbind(Class = data$Class,as.data.frame(res$ind$coord))[train,]
 data_test = cbind(Class = data$Class,as.data.frame(res$ind$coord))[!train,]
 
@@ -189,13 +188,10 @@ data_test = cbind(Class = data$Class,as.data.frame(res$ind$coord))[!train,]
 
 
 res.glm.complet = glm(Class~.,
-              family=binomial,data=data_train)
+                      family=binomial,data=data_train)
 summary(res.glm.complet)
 
-probabilities = res.glm.complet %>% predict(data_test, type = "response")
-predicted.classes = ifelse(probabilities > 0.5, "Kecimen", "Besni")
-predicted.classes
-mean(predicted.classes == data_test$Class) #0.865406
+
 
 
 #mod?le deux composantes principales
@@ -209,7 +205,6 @@ summary(res.glm.prin)
 
 probabilities = res.glm.prin %>% predict(data_test, type = "response")
 predicted.classes = ifelse(probabilities > 0.5, "Kecimen", "Besni")
-predicted.classes
 mean(predicted.classes == data_test$Class) #0.8709677
 
 library(tidyverse)
@@ -233,7 +228,6 @@ glm.AIC = glm(Class~Dim.1+Dim.2 + Dim.3 + Dim.5,family=binomial,data=data_train)
 
 probabilities = glm.AIC %>% predict(data_test, type = "response")
 predicted.classes = ifelse(probabilities > 0.5, "Kecimen", "Besni")
-predicted.classes
 mean(predicted.classes == data_test$Class) #0.862069
 
 
@@ -264,7 +258,7 @@ res.svm = svm(Class~Dim.1+Dim.2, data=data_train , kernel ='linear', scale =FALS
 summary(res.svm)
 plot(res.svm, data_train,Dim.2~Dim.1 )
 
-table(pred=predict(res.svm),vrai=data_train$Class)
+
 # pred      Besni Kecimen
 # Besni     250      37
 # Kecimen    43     270
@@ -286,6 +280,270 @@ table(pred=predict(res.svm),vrai=data_train$Class)
 # Kecimen    43     269
 
 
-y_gridL = predict(res.svm, newdata = data_test)
+test_pred = predict(res.svm, newdata = data_test)
 
-table(pred = y_gridL,vrai = data_test$Class)
+table(pred = test_pred,vrai = data_test$Class)
+
+
+#question 4 : courbe ROC
+
+#courbe roc pour mod?le complet test et appentissage superpos?
+library(ROCR)
+proba.complet.test = res.glm.complet %>% predict(data_test, type = "response")
+pred = prediction(proba.complet.test,data_test$Class)
+ROC = performance(pred,"sens","fpr")
+plot(ROC, xlab="1-specif", main="courbes ROC")               
+lines(c(0,1),c(0,1),lty=2) 
+
+proba.complet.train = res.glm.complet %>% predict(data_train, type = "response")
+pred.train = prediction(proba.complet.train,data_train$Class)
+ROC_train = performance(pred.train,"sens","fpr")
+plot(ROC_train, xlab="1-specif", main="courbes ROC",col =2,add=TRUE)
+
+
+legend("bottomright",legend= c(paste("?chantillon d'apprentissage"),
+                               paste("?chantillon de test")
+), col=1:2, lty=1)
+
+
+#Courbe des 4 mod?le de la question 2 sur ?chantillon test
+
+proba.complet.test = res.glm.complet %>% predict(data_test, type = "response")
+pred_complet = prediction(proba.complet.test,data_test$Class)
+class(pred_complet) 
+mode(pred_complet) 
+ROC_complet = performance(pred,"sens","fpr")
+plot(ROC_complet, xlab="1-specif", main="courbes ROC",legend = "complet")
+
+proba.princ.test = res.glm.prin %>% predict(data_test, type = "response")
+pred_princ = prediction(proba.princ.test,data_test$Class)
+class(pred_princ) 
+mode(pred_princ) 
+ROC_princ = performance(pred,"sens","fpr")
+plot(ROC_princ, xlab="1-specif", main="courbes ROC",col=2,add=TRUE,legend="2 CP")
+
+x.test <- model.matrix(Class ~., data_test)[,-1] #on retire l'intercept!
+proba.lasso.test = lasso.fit %>% predict(newx=x.test)
+pred_lasso = prediction(proba.lasso.test,data_test$Class)
+class(pred_lasso) 
+mode(pred_lasso) 
+ROC_lasso = performance(pred_lasso,"sens","fpr")
+plot(ROC_lasso, xlab="1-specif", main="courbes ROC",col=3,add=TRUE,legend="Lasso")
+
+proba.aic.test = glm.AIC %>% predict(data_test, type = "response")
+pred_AIC = prediction(proba.aic.test,data_test$Class)
+class(pred_AIC) 
+mode(pred_AIC) 
+ROC_AIC = performance(pred_AIC,"sens","fpr")
+plot(ROC_AIC, xlab="1-specif", main="courbes ROC",col=4,add=TRUE,legend="AIC")
+
+
+
+perf1= performance(pred_complet, "auc")
+(AUC1=round(unlist(perf1@y.values),4) ) 
+perf2 = performance(pred_princ, "auc")
+(AUC2=round(unlist(perf2@y.values),4) )
+perf3 = performance(pred_lasso, "auc")
+(AUC3=round(unlist(perf3@y.values),4) )
+perf4 = performance(pred_AIC, "auc")
+(AUC4=round(unlist(perf4@y.values),4) )
+
+legend("bottomright",legend= c(paste("AUC complet: ",AUC1),
+                               paste("AUC 2 CP: ",AUC2),
+                               paste("AUC lasso: ",AUC3),
+                               paste("AUC AIC: ",AUC4)
+), col=1:4, lty=1)
+
+#QUESTION 5
+
+#on cherche le meilleur seuil
+
+pred_AIC %>%
+  performance(measure = "tpr", x.measure = "fpr") -> result
+
+plotdata <- data.frame(x = result@x.values[[1]],
+                       y = result@y.values[[1]], 
+                       p = result@alpha.values[[1]])
+
+
+dist_vec <- plotdata$x^2 + (1 - plotdata$y)^2
+opt_pos <- which.min(dist_vec)
+
+seuil = plotdata[opt_pos, ]$p  #0.0505
+
+###############en apprentissage##########################
+#mod?le complet 
+predicted.classes.complet.app = ifelse(proba.complet.train >seuil, "Kecimen", "Besni")
+?acc = mean(predicted.classes.complet.app == data_train$Class) #0.8616667
+1- acc #0.1383333
+
+
+#mod?le 2 premi?re composantes principales 
+
+
+proba.princ.train = res.glm.prin %>% predict(data_train, type = "response")
+predicted.classes.princ.train = ifelse(proba.princ.train >seuil, "Kecimen", "Besni")
+acc = mean(predicted.classes.princ.train == data_train$Class) #0.8616667
+1- acc #0.1333333
+
+#mod?le AIC
+proba.aic.train = glm.AIC %>% predict(data_train, type = "response")
+predicted.classes.aic.app = ifelse(proba.aic.train >seuil, "Kecimen", "Besni")
+1-mean(predicted.classes.aic.app == data_train$Class) #0.8583333 0.1416667
+
+#mod?le lasso
+x.train <- model.matrix(Class ~., data_train)[,-1] #on retire l'intercept!
+proba.lasso.train = lasso.fit %>% predict(newx=x.train)
+predicted.classes.lasso.train = ifelse(proba.lasso.train > seuil, "Kecimen", "Besni")
+1-mean(predicted.classes.lasso.train == data_train$Class) #0.155
+
+
+#mod?le SVM
+
+pred_train = predict(res.svm,data_train)
+1-mean(pred_train==data_train$Class) #0.135
+
+
+######en test###############################
+
+#mod?le complet 
+predicted.classes.complet.test = ifelse(proba.complet.test >seuil, "Kecimen", "Besni")
+acc = mean(predicted.classes.complet.test == data_test$Class) #0.8616667
+1- acc #0.134594
+
+
+#mod?le 2 premi?re composantes principales 
+
+
+proba.princ.test = res.glm.prin %>% predict(data_test, type = "response")
+predicted.classes.princ.test = ifelse(proba.princ.test >seuil, "Kecimen", "Besni")
+acc = mean(predicted.classes.princ.test == data_test$Class) #0.8616667
+1- acc #0.1290323
+
+#mod?le AIC
+proba.aic.test = glm.AIC %>% predict(data_test, type = "response")
+predicted.classes.aic.test = ifelse(proba.aic.test >seuil, "Kecimen", "Besni")
+1-mean(predicted.classes.aic.test == data_test$Class) #0.137931
+
+#mod?le lasso
+x.test <- model.matrix(Class ~., data_test)[,-1] #on retire l'intercept!
+proba.lasso.test = lasso.fit %>% predict(newx=x.test)
+predicted.classes.lasso.test = ifelse(proba.lasso.test > seuil, "Kecimen", "Besni")
+1-mean(predicted.classes.lasso.test == data_test$Class) #0.1535039
+
+
+#mod?le SVM
+
+
+pred_test = predict(res.svm,data_test)
+1-mean(pred_test==data_test$Class) #0.1290323
+
+#####################PARTIE III###############################################
+
+# on ne travaille que sur les 2 premi?res composantes principales 
+
+comp1 = res$ind$coord[train,1]
+comp2 = res$ind$coord[train,2]
+data3 = as.data.frame(cbind(Class=data_train$Class,dim1 = comp1,dim2 = comp2))
+
+data3_B = data3[data3$Class=="1",]
+data3_K = data3[data3$Class=="2",]
+
+
+comp1_test = res$ind$coord[!train,1]
+comp2_test = res$ind$coord[!train,2]
+data3_test = as.data.frame(cbind(Class=data_test$Class,dim1 = comp1_test,dim2 = comp2_test))
+
+
+
+###question 2
+##a)
+
+# Analyse discriminante lin?aire (LDA) : Utilise des combinaisons lin?aires
+# de pr?dicteurs pour pr?dire la classe d'une observation 
+# donn?e. Elle suppose que les variables pr?dicteurs (p) sont
+# normalement distribu?es et que les classes ont des variances
+# identiques (pour une analyse univari?e, p = 1) ou des matrices
+# de covariance identiques (pour une analyse multivari?e, p > 1).
+
+
+#b) 
+
+# calcul de mu_kecimen et mu_besni
+
+muk = colMeans(data3_K[,-1])
+mub = colMeans(data3_B[,-1])
+
+#calcul de la matrice de cov
+
+sigma_K = t(as.matrix(data3_K[,-1] - muk))%*%as.matrix(data3_K[,-1]-muk)
+sigma_B = t(as.matrix(data3_B[,-1]-mub))%*%as.matrix(data3_B[,-1]-mub)
+
+sigma = cov(as.matrix(data3_K[,-1]))+ cov(as.matrix(data3_B[,-1]))
+invSigma = solve(sigma)
+coef  = invSigma%*%(muk-mub)
+
+#              [,1]
+# dim1 -0.0012498297
+# dim2 -0.0002739991
+
+#calcul de l'intercept 
+
+inter = log(nrow(data3_K)/nrow(data3_B))-0.5*(-t(mub) %*% invSigma %*% mub+t(muk) %*% invSigma %*% muk)
+#0.04579246
+
+##c) V?rification de la formule th?orique
+
+eig = eigen(sigma)
+lambda = diag(eig$values)
+U = -eig$vectors
+new_coef = U%*%solve(lambda)%*%t(U)%*%(muk-mub)
+coef-new_coef
+# [,1]
+# dim1 -2.220446e-16
+# dim2  2.775558e-17
+
+new_intercept = log(nrow(data3_K)/nrow(data3_B))-0.5*(-t(mub) %*% U%*%solve(lambda)%*%t(U) %*% mub+t(muk) %*% U%*%solve(lambda)%*%t(U) %*% muk)
+new_intercept - inter # 0
+
+
+####d) plot dans le premier plan principal avec droite d?cision
+
+
+plt1 + geom_abline(intercept = -inter/coef[2], slope = -coef[1]/coef[2])
+
+
+
+####question 3
+
+#prediction avec question pr?c?dente sur ?chantillon test
+
+predict = ifelse(as.matrix(data3_test[,-1])%*%coef > -0.05820362, "2", "1") #2 : kecimen 1:Besni
+mean(as.factor(predict)==data3_test$Class) #0.85
+
+
+
+#LDA avec fonction
+library(MASS)
+
+model <- lda(Class~., data = data3)
+predictions <- model %>% predict(data3_test[,-1])
+mean(predictions$class!=data3_test$Class)
+#0.1433333
+
+#courbe ROC associ? ? LDA
+
+library(ROCR)
+
+pred <- prediction(predictions$posterior[,2], data3_test$Class) 
+perf <- performance(pred,"tpr","fpr")
+AUC_LDA = performance(pred,"auc")
+(AUC5 = round(unlist(AUC_LDA@y.values),4) )
+plot(perf, xlab="1-specif", main="courbes ROC",col=5,add=TRUE,legend="AIC")
+legend("bottomright",legend= c(paste("AUC complet: ",AUC1),
+                               paste("AUC 2 CP: ",AUC2),
+                               paste("AUC lasso: ",AUC3),
+                               paste("AUC AIC: ",AUC4),
+                               paste("AUC LDA :", AUC5)
+), col=1:5, lty=1)
+
