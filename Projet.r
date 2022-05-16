@@ -45,7 +45,7 @@ plt4
 plt3 = plot(res.PCA,choix="var")
 cowplot::plot_grid(plt1, plt3, nrow=1, ncol=2)
 
-barplot(res$eig[,1])
+barplot(res.PCA$eig[,1])
 
 res.PCA$var$cos2[,1:2]
 # > res$var$cos2[,1:2]
@@ -154,47 +154,45 @@ res.hcpc = HCPC(res.pca2, nb.clust=2, graph = TRUE)
 groupes.hcpc7 = res.hcpc$data.clust$clust
 table(pred=groupes.hcpc7,vrai=data$Class) #erreur de classification = 209
 
+#for pretty graphs
 
-library("factoextra")
+#library("factoextra")
+#fviz_dend(res.hcpc, 
+#          cex = 0.7,                     # Taille du text
+#          palette = "jco",               # Palette de couleur ?ggpubr::ggpar
+#          rect = TRUE, rect_fill = TRUE, # Rectangle autour des groupes
+#          rect_border = "jco",           # Couleur du rectangle
+#          labels_track_height = 0.8      # Augment l'espace pour le texte
+#)
 
-fviz_dend(res.hcpc, 
-          cex = 0.7,                     # Taille du text
-          palette = "jco",               # Palette de couleur ?ggpubr::ggpar
-          rect = TRUE, rect_fill = TRUE, # Rectangle autour des groupes
-          rect_border = "jco",           # Couleur du rectangle
-          labels_track_height = 0.8      # Augment l'espace pour le texte
-)
-
-fviz_cluster(res.hcpc,
-             repel = TRUE,            # Evite le chevauchement des textes
-             show.clust.cent = TRUE, # Montre le centre des clusters
-             palette = "jco",         # Palette de couleurs, voir ?ggpubr::ggpar
-             ggtheme = theme_minimal(),
-             main = "Factor map"
-)
+#fviz_cluster(res.hcpc,
+#             repel = TRUE,            # Evite le chevauchement des textes
+#             show.clust.cent = TRUE, # Montre le centre des clusters
+#             palette = "jco",         # Palette de couleurs, voir ?ggpubr::ggpar
+#             ggtheme = theme_minimal(),
+#             main = "Factor map"
+#)
 
 ########################################################### PARTIE 2 
 
-#question2
+#-------------------------------------------------question2
 
 set.seed(1)
 n = nrow(data)
 train = sample(c(TRUE,FALSE),n,rep=TRUE,prob=c(2/3,1/3))
 
+res=res.PCA
+
 data_train = cbind(Class = data$Class,as.data.frame(res$ind$coord))[train,]
 data_test = cbind(Class = data$Class,as.data.frame(res$ind$coord))[!train,]
 
-#mod?le complet
-
+#modele complet
 
 res.glm.complet = glm(Class~.,
                       family=binomial,data=data_train)
 summary(res.glm.complet)
 
-
-
-
-#mod?le deux composantes principales
+#modele deux composantes principales
 
 comp1 = res$ind$coord[train,1]
 comp2 = res$ind$coord[train,2]
@@ -202,6 +200,8 @@ new = as.data.frame(cbind(Class=data_train$Class,dim1 = comp1,dim2 = comp2))
 res.glm.prin = glm(Class~(Dim.1+Dim.2) ,family=binomial,data=data_train )
 
 summary(res.glm.prin)
+
+library(magrittr)
 
 probabilities = res.glm.prin %>% predict(data_test, type = "response")
 predicted.classes = ifelse(probabilities > 0.5, "Kecimen", "Besni")
@@ -221,7 +221,7 @@ data_train %>%
   )
 
 
-# mod?le par AIC
+# modele par AIC
 glm = glm(Class~.,family=binomial,data=data_train)
 selection=MASS::stepAIC(glm,direction="both")
 glm.AIC = glm(Class~Dim.1+Dim.2 + Dim.3 + Dim.5,family=binomial,data=data_train)
@@ -231,7 +231,7 @@ predicted.classes = ifelse(probabilities > 0.5, "Kecimen", "Besni")
 mean(predicted.classes == data_test$Class) #0.862069
 
 
-# mod?le obtenu par r?gression p?nalis?e lasso
+# modele obtenu par regression penalisee lasso
 
 library(glmnet)
 
@@ -247,9 +247,9 @@ predicted.classes
 mean(predicted.classes == data_test$Class) #0.8464961
 
 
-#question 3 : SVM
+#-----------------------------------------------------question 3 : SVM
 
-#SVM lin?aire
+#SVM lineaire
 
 library(e1071)
 co= cbind(0.001, 0.01, 0.1, 1, 5, 10, 100)
@@ -265,7 +265,6 @@ plot(res.svm, data_train,Dim.2~Dim.1 )
 
 
 #SVM noyau polynomial 
-
 
 obj = tune.svm(Class~Dim.1+Dim.2, data=data_train , kernel ='linear', scale =FALSE,tunecontrol=tune.control(cross=2), cost = co ,coef0 = (0:10), degree = (1:10))
 res.svm = svm(Class~Dim.1+Dim.2, data=data_train , kernel ='polynomial',scale = FALSE,cost= 1,coef0=0, degree=1)
@@ -285,9 +284,9 @@ test_pred = predict(res.svm, newdata = data_test)
 table(pred = test_pred,vrai = data_test$Class)
 
 
-#question 4 : courbe ROC
+#--------------------------------------question 4 : courbe ROC
 
-#courbe roc pour mod?le complet test et appentissage superpos?
+#courbe roc pour modele complet test et appentissage superpose
 library(ROCR)
 proba.complet.test = res.glm.complet %>% predict(data_test, type = "response")
 pred = prediction(proba.complet.test,data_test$Class)
@@ -301,12 +300,12 @@ ROC_train = performance(pred.train,"sens","fpr")
 plot(ROC_train, xlab="1-specif", main="courbes ROC",col =2,add=TRUE)
 
 
-legend("bottomright",legend= c(paste("?chantillon d'apprentissage"),
-                               paste("?chantillon de test")
+legend("bottomright",legend= c(paste("echantillon d'apprentissage"),
+                               paste("echantillon de test")
 ), col=1:2, lty=1)
 
 
-#Courbe des 4 mod?le de la question 2 sur ?chantillon test
+#Courbe des 4 modele de la question 2 sur echantillon test
 
 proba.complet.test = res.glm.complet %>% predict(data_test, type = "response")
 pred_complet = prediction(proba.complet.test,data_test$Class)
@@ -354,7 +353,7 @@ legend("bottomright",legend= c(paste("AUC complet: ",AUC1),
                                paste("AUC AIC: ",AUC4)
 ), col=1:4, lty=1)
 
-#QUESTION 5
+#--------------------------------------------------QUESTION 5
 
 #on cherche le meilleur seuil
 
@@ -372,75 +371,79 @@ opt_pos <- which.min(dist_vec)
 seuil = plotdata[opt_pos, ]$p  #0.0505
 
 ###############en apprentissage##########################
-#mod?le complet 
+#modele complet 
 predicted.classes.complet.app = ifelse(proba.complet.train >seuil, "Kecimen", "Besni")
-?acc = mean(predicted.classes.complet.app == data_train$Class) #0.8616667
+acc = mean(predicted.classes.complet.app == data_train$Class) #0.8616667
 1- acc #0.1383333
 
 
-#mod?le 2 premi?re composantes principales 
-
-
+#modele 2 premiere composantes principales 
 proba.princ.train = res.glm.prin %>% predict(data_train, type = "response")
 predicted.classes.princ.train = ifelse(proba.princ.train >seuil, "Kecimen", "Besni")
 acc = mean(predicted.classes.princ.train == data_train$Class) #0.8616667
 1- acc #0.1333333
 
-#mod?le AIC
+#modele AIC
 proba.aic.train = glm.AIC %>% predict(data_train, type = "response")
 predicted.classes.aic.app = ifelse(proba.aic.train >seuil, "Kecimen", "Besni")
 1-mean(predicted.classes.aic.app == data_train$Class) #0.8583333 0.1416667
 
-#mod?le lasso
+#modele lasso
 x.train <- model.matrix(Class ~., data_train)[,-1] #on retire l'intercept!
 proba.lasso.train = lasso.fit %>% predict(newx=x.train)
 predicted.classes.lasso.train = ifelse(proba.lasso.train > seuil, "Kecimen", "Besni")
 1-mean(predicted.classes.lasso.train == data_train$Class) #0.155
 
-
-#mod?le SVM
-
+#modele SVM
 pred_train = predict(res.svm,data_train)
 1-mean(pred_train==data_train$Class) #0.135
 
 
 ######en test###############################
 
-#mod?le complet 
+#modele complet 
 predicted.classes.complet.test = ifelse(proba.complet.test >seuil, "Kecimen", "Besni")
 acc = mean(predicted.classes.complet.test == data_test$Class) #0.8616667
 1- acc #0.134594
 
 
-#mod?le 2 premi?re composantes principales 
-
-
+#modele 2 premiere composantes principales 
 proba.princ.test = res.glm.prin %>% predict(data_test, type = "response")
 predicted.classes.princ.test = ifelse(proba.princ.test >seuil, "Kecimen", "Besni")
 acc = mean(predicted.classes.princ.test == data_test$Class) #0.8616667
 1- acc #0.1290323
 
-#mod?le AIC
+#modele AIC
 proba.aic.test = glm.AIC %>% predict(data_test, type = "response")
 predicted.classes.aic.test = ifelse(proba.aic.test >seuil, "Kecimen", "Besni")
 1-mean(predicted.classes.aic.test == data_test$Class) #0.137931
 
-#mod?le lasso
+#modele lasso
 x.test <- model.matrix(Class ~., data_test)[,-1] #on retire l'intercept!
 proba.lasso.test = lasso.fit %>% predict(newx=x.test)
 predicted.classes.lasso.test = ifelse(proba.lasso.test > seuil, "Kecimen", "Besni")
 1-mean(predicted.classes.lasso.test == data_test$Class) #0.1535039
 
-
-#mod?le SVM
-
-
+#modele SVM
 pred_test = predict(res.svm,data_test)
 1-mean(pred_test==data_test$Class) #0.1290323
 
-#####################PARTIE III###############################################
+#################################################################### PARTIE III
 
-# on ne travaille que sur les 2 premi?res composantes principales 
+#-----------------------------------------------------------question 1
+
+#set.seed(1)
+#n = nrow(data)
+#train = sample(c(TRUE,FALSE),n,rep=TRUE,prob=c(2/3,1/3))
+data_train2 = cbind(as.data.frame(data.scale),Class = data$Class)[train,] # need own data.train to apply pca to
+data_test2 = cbind(as.data.frame(data.scale),Class = data$Class)[!train,]
+res.pca3=PCA(data_train2, ncp = 2, quali.sup = p, graph = TRUE)
+summary(res.pca3)
+resproj.pca3 <- suprow(res.pca3, data_test2)
+
+#----------------
+
+# on ne travaille que sur les 2 premieres composantes principales 
 
 comp1 = res$ind$coord[train,1]
 comp2 = res$ind$coord[train,2]
@@ -449,14 +452,11 @@ data3 = as.data.frame(cbind(Class=data_train$Class,dim1 = comp1,dim2 = comp2))
 data3_B = data3[data3$Class=="1",]
 data3_K = data3[data3$Class=="2",]
 
-
 comp1_test = res$ind$coord[!train,1]
 comp2_test = res$ind$coord[!train,2]
 data3_test = as.data.frame(cbind(Class=data_test$Class,dim1 = comp1_test,dim2 = comp2_test))
 
-
-
-###question 2
+#-----------------------------------------------------------question 2
 ##a)
 
 # Analyse discriminante lin?aire (LDA) : Utilise des combinaisons lin?aires
