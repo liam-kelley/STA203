@@ -102,7 +102,7 @@ rect.hclust(cah.ward2,k=2)
 # partition in 4 groups
 groupes.cah <- cutree(cah.ward2,k=2)
 # assignment of the instances to clusters
-print(sort(groupes.cah))
+#print(sort(groupes.cah))
 plot(as.factor(groupes.cah))
 
 #erreur de classification
