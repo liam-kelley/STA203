@@ -520,7 +520,7 @@ plt1 + geom_abline(intercept = -inter/coef[2], slope = -coef[1]/coef[2])
 
 
 
-####question 3
+##-------------------------------------------------------question 3
 
 #prediction avec question pr?c?dente sur ?chantillon test
 
@@ -553,3 +553,33 @@ legend("bottomright",legend= c(paste("AUC complet: ",AUC1),
                                paste("AUC LDA :", AUC5)
 ), col=1:5, lty=1)
 
+##-------------------------------------------------------question 4
+
+res.PCA5=PCA(data,quali.sup = p, ncp=7, graph = TRUE)
+
+comp1 = res.PCA5$ind$coord[train,1]
+comp2 = res.PCA5$ind$coord[train,2]
+comp3 = res.PCA5$ind$coord[train,3]
+comp4 = res.PCA5$ind$coord[train,4]
+comp5 = res.PCA5$ind$coord[train,5]
+comp6 = res.PCA5$ind$coord[train,6]
+comp7 = res.PCA5$ind$coord[train,7]
+data3full = as.data.frame(cbind(Class=data_train$Class,dim1 = comp1,dim2 = comp2,
+                                dim3 = comp3,dim4 = comp4,
+                                dim5 = comp5,dim6 = comp6,
+                                dim7 = comp7))
+
+data3full_B = data3full[data3full$Class=="1",]
+data3full_K = data3full[data3full$Class=="2",]
+
+comp1_test = res.PCA5$ind$coord[!train,1]
+comp2_test = res.PCA5$ind$coord[!train,2]
+comp3_test = res.PCA5$ind$coord[!train,3]
+comp4_test = res.PCA5$ind$coord[!train,4]
+comp5_test = res.PCA5$ind$coord[!train,5]
+comp6_test = res.PCA5$ind$coord[!train,6]
+comp7_test = res.PCA5$ind$coord[!train,7]
+data3full_test = as.data.frame(cbind(Class=data_test$Class,dim1 = comp1_test,dim2 = comp2_test,
+                                     dim3 = comp3_test, dim4 = comp4_test,
+                                     dim5 = comp5_test, dim6 = comp6_test,
+                                     dim7 = comp7_test))
